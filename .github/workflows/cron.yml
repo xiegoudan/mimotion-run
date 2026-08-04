@@ -12,16 +12,16 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 3
 
-    # 手动触发时直接运行，自动触发时仅当前驱工作流成功才运行
     if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
 
+    # 使用 PAT 时，可以不加 permissions，但保留也无妨（PAT 权限更高）
     permissions:
-      contents: write          # 只需要写入仓库内容（包括 .github/workflows/ 下的文件）
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
         with:
-          token: ${{ github.token }}
+          token: ${{ secrets.PAT }}           # ← 使用你之前设置的 PAT
 
       - name: random cron
         run: |
