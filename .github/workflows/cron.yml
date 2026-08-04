@@ -1,16 +1,22 @@
 name: 随机定时运行
 
 on:
-  workflow_dispatch:          # 手动触发
+  workflow_dispatch:                          # 手动触发（用于测试）
+  workflow_run:
+    workflows: ["刷步数"]                     # 自动触发：当“刷步数”成功完成时
+    types:
+      - completed
 
 jobs:
   repo-sync:
     runs-on: ubuntu-latest
     timeout-minutes: 3
 
+    # 手动触发时直接运行，自动触发时仅当前驱工作流成功才运行
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+
     permissions:
-      contents: write
-      workflows: write         # 关键：允许修改 .github/workflows/*.yml
+      contents: write          # 只需要写入仓库内容（包括 .github/workflows/ 下的文件）
 
     steps:
       - uses: actions/checkout@v4
